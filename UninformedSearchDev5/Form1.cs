@@ -9,6 +9,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
+
+////
+///     Nom: ISAAC Sammuel Ramclief
+///     Cours: Introduction à l'intelligence artificielle
+///     Devoir: Devoir 5
+///             -> Maze Uninformed Search
+///
+
+
 namespace UninformedSearchDev5
 {
     public partial class Form1 : Form
@@ -21,10 +31,20 @@ namespace UninformedSearchDev5
         private Node[][] Positions; // Corpus - Population
         private List<Node> ListeSolution;
         List<Node> NodesExplorees;
+
+        /// <summary>
+        /// Constructeur de la classe Form1
+        /// </summary>
         public Form1()
         {
             InitializeComponent();
         }
+
+        /// <summary>
+        /// Méthode appelée lors du premier affichage du formulaire.
+        ///  Si FirstPaintEvent est vrai , la méthode appelle Setup().
+        /// </summary>
+        /// <param name="e">Un event</param>
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
@@ -33,11 +53,20 @@ namespace UninformedSearchDev5
                 Setup();
             }
         }
+
+        /// <summary>
+        /// Méthode appelée lorsque la taille du formulaire change.
+        /// </summary>
+        /// <param name="e">Un event</param>
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
             Setup();
         }
+
+        /// <summary>
+        /// Maximise la fenêtre, ajuste la taille du bouton btnStart et du pictureBox2 pour occuper la moitié de la largeur de la fenêtre.
+        /// </summary>
         private void Setup()
         {
             FirstPaintEvent = false;
@@ -47,15 +76,32 @@ namespace UninformedSearchDev5
             //pictureBox1.Width = -40 + ClientSize.Width / 2;
             pictureBox2.Width = -30 + ClientSize.Width / 2;
         }
+
+        /// <summary>
+        /// Méthode de chargement du formulaire,
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
 
         }
+
+        /// <summary>
+        /// Classe pour representer une cellule du maze
+        /// </summary>
         public class Node
         {
             public int x = -1, y = -1;
             public bool EstMur = false;
             public Node parent = null;
+
+            /// <summary>
+            /// Constructoeur d'un Node avec les coordonnées et le parent spécifié.
+            /// </summary>
+            /// <param name="x_val"></param>
+            /// <param name="y_val"></param>
+            /// <param name="parent"></param>
             public Node(int x_val, int y_val, Node parent)
             {
                 x = x_val;
@@ -64,6 +110,12 @@ namespace UninformedSearchDev5
             }
         }
 
+
+        /// <summary>
+        /// Déclenche la résolution du maze lorsqu'on clique sur le bouton.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnStart_Click(object sender, EventArgs e)
         {
             if (LireFichier())
@@ -73,6 +125,12 @@ namespace UninformedSearchDev5
             }
         }
 
+        /// <summary>
+        /// Lit le fichier du labyrinthe et initialise les nœuds
+        /// Ouvre le fichier maze6.txt , lit le contenu, et initialise chaque cellule du tableau Positions comme un objet Node . 
+        /// Marque les murs, les paths, et les positions de départ et destination(A pour le départ, B pour la destination).
+        /// </summary>
+        /// <returns></returns>
         private bool LireFichier()
         {
             Depart = new Node(0, 0, null);
@@ -133,11 +191,14 @@ namespace UninformedSearchDev5
             }
             return true;
         }
-        
+
+
+        /// <summary>
+        /// Dessine le labyrinthe sur le PictureBoz -> pictureBox2 .
+        /// </summary>
         public void Imprimer()
         {
             int cellSize = 20; // Size of each cell on the grid
-            bool isCaseDeDepart = false, isCaseDeDestination = false;
             using (Graphics g = pictureBox2.CreateGraphics())
             {
                 for (int i = 0; i < NombreDeLignes; i++)
@@ -147,15 +208,9 @@ namespace UninformedSearchDev5
                         Brush brush;
 
                         if (i == Depart.x && j == Depart.y)
-                        {
-                            isCaseDeDepart = true;
                             brush = Brushes.Green; // Start
-                        }
                         else if (i == Destination.x && j == Destination.y)
-                        {
-                            isCaseDeDestination = true;
-                            brush = Brushes.Red; // Destination
-                        }
+                            brush = Brushes.Red; // Destination                        
                         else if (Positions[i][j].EstMur)
                             brush = Brushes.Black; // Wall
                         else
@@ -180,6 +235,9 @@ namespace UninformedSearchDev5
         }
 
 
+        /// <summary>
+        /// Résout le labyrinthe en utilisant une recherche en profondeur
+        /// </summary>
         private void Solve()
         {
             // Stack: trouvera la route la plus courte
@@ -222,6 +280,11 @@ namespace UninformedSearchDev5
             }
         }
 
+        /// <summary>
+        /// Génère une liste des nœuds enfants (voisins accessibles) pour un nœud donné
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         List<Node> ListeDesEnfants(Node node)
         {
             List<Node> nodesActions = new List<Node>();
@@ -264,10 +327,12 @@ namespace UninformedSearchDev5
             return nodesActions;
         }
 
-        private void pictureBox2_Click(object sender, EventArgs e)
-        {
-        }
 
+        /// <summary>
+        /// Vérifie si un nœud a déjà été exploré
+        /// </summary>
+        /// <param name="aChequer"></param>
+        /// <returns></returns>
         public bool DejaExploree(Node aChequer)
         {
             foreach (Node n in NodesExplorees)
@@ -277,17 +342,36 @@ namespace UninformedSearchDev5
             }
             return false;
         }
+
+        /// <summary>
+        /// Représente une pile pour la recherche en profondeur.
+        /// </summary>
         public class StackFrontier
         {
             private List<Node> ListeDesNodes;
+
+            /// <summary>
+            /// Constructeur de la pile
+            /// </summary>
             public StackFrontier()
             {
                 ListeDesNodes = new List<Node>();
             }
+
+            /// <summary>
+            /// Verifie si lala pile est vide
+            /// </summary>
+            /// <returns></returns>
             public bool EstVide()
             {
                 return ListeDesNodes.Count == 0;
             }
+
+            /// <summary>
+            /// Vérifie si un nœud spécifique est dans la pile
+            /// </summary>
+            /// <param name="node">Un node</param>
+            /// <returns>True si la liste est vide</returns>
             public bool ContientState(Node node)
             {
                 foreach (Node n in ListeDesNodes)
@@ -316,17 +400,36 @@ namespace UninformedSearchDev5
                 return node;
             }
         }
+
+        /// <summary>
+        /// Représente une file pour la recherche en profondeur.
+        /// </summary>
         public class QueueFrontier
         {
             private List<Node> ListeDesNodes;
+
+            /// <summary>
+            /// Constructeur qui initialise une liste vide pour les nœuds.
+            /// </summary>
             public QueueFrontier()
             {
                 ListeDesNodes = new List<Node>();
             }
+
+            /// <summary>
+            /// Vérifie si la file est vide.
+            /// </summary>
+            /// <returns></returns>
             public bool EstVide()
             {
                 return ListeDesNodes.Count == 0;
             }
+
+            /// <summary>
+            /// Vérifie si un nœud spécifique est dans la file.
+            /// </summary>
+            /// <param name="node"></param>
+            /// <returns></returns>
             public bool ContientState(Node node)
             {
                 foreach (Node n in ListeDesNodes)
